@@ -1,4 +1,4 @@
-name: Test, build and deploy to GitHub Pages
+name: Test, build and deploy Storybook to GitHub Pages
 
 on:
   push:
@@ -34,11 +34,11 @@ jobs:
       - name: Run tests
         run: npm test -- --runInBand
 
-      - name: Build
-        run: npm run build
+      - name: Build Storybook
+        run: npm run build-storybook
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
-          folder: dist
+          folder: storybook-static

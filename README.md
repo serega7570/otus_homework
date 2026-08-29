@@ -1,6 +1,6 @@
 # OTUS React homework
 
-Учебный проект курса React.js Developer. Вторая домашняя работа содержит страницу знакомства и настроенный деплой на GitHub Pages.
+Учебный проект курса React.js Developer. Компоненты интерфейса собраны и опубликованы в Storybook.
 
 ## Команды
 
@@ -11,6 +11,9 @@ npm run typecheck
 npm test
 npm run build
 npm run deploy
+npm run storybook
+npm run build-storybook
+npm run deploy-storybook
 ```
 
-После запуска dev-сервер доступен по адресу `http://localhost:2233`. Production-версия публикуется по адресу <https://serega7570.github.io/otus_homework/>.
+После запуска приложение доступно по адресу `http://localhost:2233`, а Storybook — по адресу `http://localhost:6006`. Опубликованный Storybook находится на <https://serega7570.github.io/otus_homework/>.
