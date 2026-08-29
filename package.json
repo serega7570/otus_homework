@@ -1,0 +1,11 @@
+{
+    "name": "otus_homework",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "node script-test.js"
+    },
+    "author": "",
+    "license": "ISC"
+}
