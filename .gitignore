@@ -1,1 +1,4 @@
 node_modules
+dist
+.jest
+storybook-static
