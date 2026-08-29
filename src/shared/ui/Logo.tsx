@@ -1,8 +1,8 @@
 import './components.css';
 
-export type LogoProps = {
+export type LogoProps = Readonly<{
   label?: string;
-};
+}>;
 
 export const Logo = ({ label = 'Secure UI' }: LogoProps): JSX.Element => (
   <div className="ui-logo" aria-label={label}>

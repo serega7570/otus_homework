@@ -1,8 +1,7 @@
 import { AddToCart } from './AddToCart';
 import type { ProductViewProps } from './productTypes';
+import { formatCurrency } from '../../shared/lib/formatters';
 import './product.css';
-
-const money = new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', maximumFractionDigits: 0 });
 
 export const ProductCard = ({
   price,
@@ -19,7 +18,7 @@ export const ProductCard = ({
     <div className="product-card__content">
       <h3>{name}</h3>
       <p>{description}</p>
-      <strong>{money.format(price)}</strong>
+      <strong>{formatCurrency(price, 0)}</strong>
       <AddToCart count={count} />
     </div>
   </article>

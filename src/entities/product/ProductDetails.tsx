@@ -1,8 +1,7 @@
 import { AddToCart } from './AddToCart';
 import type { ProductDetailsProps } from './productTypes';
+import { formatCurrency } from '../../shared/lib/formatters';
 import './product.css';
-
-const money = new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', maximumFractionDigits: 0 });
 
 export const ProductDetails = ({
   price,
@@ -20,7 +19,7 @@ export const ProductDetails = ({
       <span className="product-details__category">{category}</span>
       <h2>{name}</h2>
       <p>{description}</p>
-      <strong>{money.format(price)}</strong>
+      <strong>{formatCurrency(price, 0)}</strong>
       <AddToCart count={count} />
     </div>
   </article>

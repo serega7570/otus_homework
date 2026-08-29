@@ -8,7 +8,11 @@ const meta = {
   parameters: { layout: 'fullscreen' },
   args: {
     brand: 'Secure UI',
-    navigation: ['Обзор', 'Операции', 'Товары'],
+    navigation: [
+      { label: 'Обзор', href: '#overview' },
+      { label: 'Операции', href: '#operations' },
+      { label: 'Товары', href: '#products' },
+    ],
   },
   argTypes: {
     brand: { control: 'text' },

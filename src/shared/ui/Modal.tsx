@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react';
 import './components.css';
 
-export type ModalProps = {
+export type ModalProps = Readonly<{
   visible: boolean;
   children: ReactNode;
   onClose?: () => void;
-};
+}>;
 
 export const Modal = ({ visible, children, onClose }: ModalProps): JSX.Element | null => {
   if (!visible) return null;

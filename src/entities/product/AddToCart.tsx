@@ -1,8 +1,8 @@
 import './product.css';
 
-export type AddToCartProps = {
+export type AddToCartProps = Readonly<{
   count: number;
-};
+}>;
 
 export const AddToCart = ({ count }: AddToCartProps): JSX.Element => {
   if (count <= 0) {

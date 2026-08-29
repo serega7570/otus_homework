@@ -1,7 +1,6 @@
 import type { OperationViewProps } from './operationTypes';
+import { formatCurrency } from '../../shared/lib/formatters';
 import './operation.css';
-
-const money = new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' });
 
 export const OperationCard = ({
   amount,
@@ -21,7 +20,7 @@ export const OperationCard = ({
     </div>
     <strong className={`operation-card__amount operation-card__amount--${type.toLowerCase()}`}>
       {type === 'Cost' ? '−' : '+'}
-      {money.format(amount)}
+      {formatCurrency(amount)}
     </strong>
   </article>
 );
