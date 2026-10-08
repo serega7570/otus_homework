@@ -26,13 +26,13 @@
 }
 
 .operation-card__icon--cost {
-  background: #fff0ed;
+  background: var(--ui-danger-surface);
   color: var(--ui-danger);
 }
 
 .operation-card__icon--profit {
-  background: #e8f8e9;
-  color: #287d3c;
+  background: var(--ui-success-surface);
+  color: var(--ui-success);
 }
 
 .operation-card__category,
@@ -72,7 +72,7 @@
 
 .operation-card__amount--profit,
 .operation-details__amount--profit {
-  color: #287d3c;
+  color: var(--ui-success);
 }
 
 .operation-details {
@@ -117,8 +117,8 @@
   padding: 11px 16px;
   border: 0;
   border-radius: 11px;
-  background: var(--ui-ink);
-  color: #fff;
+  background: var(--ui-button-bg);
+  color: var(--ui-button-text);
   font-weight: 700;
   cursor: pointer;
 }

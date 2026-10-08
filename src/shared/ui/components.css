@@ -13,7 +13,7 @@
   height: 38px;
   place-items: center;
   border-radius: 12px;
-  background: var(--ui-ink);
+  background: var(--ui-on-accent);
   color: var(--ui-accent);
   font-size: 18px;
 }
@@ -32,8 +32,9 @@
   align-items: center;
   gap: 28px;
   padding: 12px clamp(18px, 4vw, 48px);
-  border-bottom: 1px solid rgb(220 222 214 / 85%);
-  background: rgb(244 244 239 / 88%);
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--ui-line);
+  background: var(--ui-canvas);
   backdrop-filter: blur(18px);
 }
 
@@ -98,7 +99,7 @@
   min-height: 280px;
   padding: 54px 36px 36px;
   border-radius: var(--ui-radius);
-  background: #fff;
+  background: var(--ui-surface);
   box-shadow: var(--ui-shadow);
 }
 
@@ -113,7 +114,7 @@
   place-items: center;
   border: 0;
   border-radius: 50%;
-  background: #eef0e9;
+  background: var(--ui-canvas);
   color: var(--ui-ink);
   font-size: 25px;
   cursor: pointer;
@@ -137,11 +138,76 @@
   }
 
   .ui-header__avatar {
-    margin-left: auto;
+    display: none;
   }
 
   .ui-modal__dialog {
     padding-right: 26px;
     padding-left: 26px;
   }
+}
+
+.ui-header__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.ui-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--ui-line);
+  border-radius: 10px;
+  background: var(--ui-surface);
+  color: var(--ui-ink);
+  cursor: pointer;
+}
+
+.ui-modal-demo {
+  display: flex;
+  max-width: 460px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.ui-modal-demo > input {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 14px;
+  border: 1px solid var(--ui-line);
+  border-radius: 12px;
+  background: var(--ui-surface);
+  color: var(--ui-ink);
+}
+
+.ui-button {
+  padding: 13px 18px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--ui-button-bg);
+  color: var(--ui-button-text);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ui-modal-demo__message {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.ui-state-preview {
+  display: grid;
+  justify-items: start;
+  gap: 24px;
+  padding: 24px;
+}
+
+:where(button, input, select, a):focus-visible {
+  outline: 2px solid var(--ui-accent-ink);
+  outline-offset: 3px;
 }

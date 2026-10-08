@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { Header } from './Header';
+import { useTranslation } from 'react-i18next';
 
 const meta = {
   title: 'Общие компоненты/Header',
@@ -8,11 +9,6 @@ const meta = {
   parameters: { layout: 'fullscreen' },
   args: {
     brand: 'Secure UI',
-    navigation: [
-      { label: 'Обзор', href: '#overview' },
-      { label: 'Операции', href: '#operations' },
-      { label: 'Товары', href: '#products' },
-    ],
   },
   argTypes: {
     brand: { control: 'text' },
@@ -24,12 +20,15 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Sticky: Story = {
-  render: (args) => (
+  render: function Render(args) {
+    const { t } = useTranslation();
+    return (
     <div style={{ minHeight: '140vh' }}>
       <Header {...args} />
-      <div style={{ padding: '48px', color: '#686d64' }}>
-        Прокрутите страницу: Header останется у верхней границы.
+      <div style={{ padding: '48px', color: 'var(--ui-muted)' }}>
+        {t('stories.scroll')}
       </div>
     </div>
-  ),
+    );
+  },
 };

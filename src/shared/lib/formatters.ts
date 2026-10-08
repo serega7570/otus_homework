@@ -1,23 +1,31 @@
-const currencyFormatters = new Map<number, Intl.NumberFormat>();
+const currencyFormatters = new Map<string, Intl.NumberFormat>();
 
-export const formatCurrency = (value: number, maximumFractionDigits = 2): string => {
-  let formatter = currencyFormatters.get(maximumFractionDigits);
+export const formatCurrency = (value: number, maximumFractionDigits = 2, locale = 'ru-RU'): string => {
+  const key = `${locale}:${maximumFractionDigits}`;
+  let formatter = currencyFormatters.get(key);
 
   if (!formatter) {
-    formatter = new Intl.NumberFormat('ru-RU', {
+    formatter = new Intl.NumberFormat(locale, {
       style: 'currency',
       currency: 'RUB',
       maximumFractionDigits,
     });
-    currencyFormatters.set(maximumFractionDigits, formatter);
+    currencyFormatters.set(key, formatter);
   }
 
   return formatter.format(value);
 };
 
-const dateFormatter = new Intl.DateTimeFormat('ru-RU', { dateStyle: 'long' });
+const dateFormatters = new Map<string, Intl.DateTimeFormat>();
 
-export const formatDate = (value: string): string => {
+export const formatDate = (value: string, locale = 'ru-RU'): string => {
   const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? value : dateFormatter.format(date);
+  if (Number.isNaN(date.getTime())) return value;
+
+  let formatter = dateFormatters.get(locale);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(locale, { dateStyle: 'long' });
+    dateFormatters.set(locale, formatter);
+  }
+  return formatter.format(date);
 };

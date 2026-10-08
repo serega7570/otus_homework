@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { Modal, type ModalProps } from './Modal';
+import { useTranslation } from 'react-i18next';
 
 const ModalDemo = ({ visible, children }: ModalProps): JSX.Element => {
   const [isOpen, setIsOpen] = useState(visible);
+  const { t } = useTranslation();
 
   useEffect(() => {
     setIsOpen(visible);
@@ -14,23 +16,15 @@ const ModalDemo = ({ visible, children }: ModalProps): JSX.Element => {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        style={{
-          padding: '13px 18px',
-          border: 0,
-          borderRadius: '12px',
-          background: '#1d211b',
-          color: '#fff',
-          fontWeight: 700,
-          cursor: 'pointer',
-        }}
+        className="ui-button"
       >
-        Открыть модальное окно
+        {t('modal.open')}
       </button>
-      <p style={{ color: '#686d64' }}>
-        Состояние visible: <strong>{String(isOpen)}</strong>
+      <p style={{ color: 'var(--ui-muted)' }}>
+        {t('stories.visibility')}: <strong>{String(isOpen)}</strong>
       </p>
       <Modal visible={isOpen} onClose={() => setIsOpen(false)}>
-        <h2>Новое действие</h2>
+        <h2>{t('stories.action')}</h2>
         <p>{children}</p>
       </Modal>
     </div>

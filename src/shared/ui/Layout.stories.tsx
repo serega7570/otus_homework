@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { Layout } from './Layout';
+import { useTranslation } from 'react-i18next';
 
 const meta = {
   title: 'Общие компоненты/Layout',
@@ -20,14 +21,17 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  render: (args) => (
+  render: function Render(args) {
+    const { t } = useTranslation();
+    return (
     <Layout {...args}>
       <section
-        style={{ padding: '48px', borderRadius: '24px', background: '#fff', border: '1px solid #dcded6' }}
+        style={{ padding: '48px', borderRadius: '24px', background: 'var(--ui-surface)', border: '1px solid var(--ui-line)' }}
       >
-        <h1 style={{ marginTop: 0 }}>Рабочее пространство</h1>
+        <h1 style={{ marginTop: 0 }}>{t('stories.workspace')}</h1>
         <p>{args.children}</p>
       </section>
     </Layout>
-  ),
+    );
+  },
 };
