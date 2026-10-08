@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { ThemeProvider } from '../shared/providers/ThemeProvider';
 import { LanguageProvider } from '../shared/providers/LanguageProvider';
 import { Header, ModalWithInput } from '../shared/ui';
+import { OperationFeed } from '../entities/operation';
 
 const profileItems = [
   { title: 'home.experienceTitle', text: 'home.experienceText', accent: '01' },
@@ -20,6 +21,7 @@ const HomePage = (): JSX.Element => {
           { label: t('navigation.overview'), href: '#overview' },
           { label: t('navigation.about'), href: '#about' },
           { label: t('navigation.demo'), href: '#demo' },
+          { label: t('navigation.operations'), href: '#operations' },
         ]}
       />
       <main className="page">
@@ -56,6 +58,12 @@ const HomePage = (): JSX.Element => {
           <h2 id="demo-title">{t('home.demoTitle')}</h2>
           <p>{t('home.demoText')}</p>
           <ModalWithInput />
+        </section>
+
+        <section id="operations" className="state-demo" aria-labelledby="operations-title">
+          <h2 id="operations-title">{t('operationList.title')}</h2>
+          <p>{t('operationList.description')}</p>
+          <OperationFeed />
         </section>
 
         <footer className="footer">

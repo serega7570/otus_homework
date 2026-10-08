@@ -241,6 +241,7 @@ a {
 
 #overview,
 #about,
-#demo {
+#demo,
+#operations {
   scroll-margin-top: 160px;
 }

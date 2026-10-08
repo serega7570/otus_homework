@@ -89,6 +89,7 @@
   min-height: 420px;
   padding: 24px;
   place-items: center;
+  color: var(--ui-ink);
   background: rgb(15 17 14 / 72%);
   backdrop-filter: blur(4px);
 }

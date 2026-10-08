@@ -1,15 +1,16 @@
 import { useTranslation } from 'react-i18next';
+import { memo } from 'react';
 import type { OperationViewProps } from './operationTypes';
 import { formatCurrency } from '../../shared/lib/formatters';
 import './operation.css';
 
-export const OperationCard = ({
+export const OperationCard = memo(function OperationCard({
   amount,
   category,
   name,
   description,
   type = 'Cost',
-}: OperationViewProps): JSX.Element => {
+}: OperationViewProps): JSX.Element {
   const { i18n } = useTranslation();
   return (
     <article className="operation-card">
@@ -27,4 +28,4 @@ export const OperationCard = ({
       </strong>
     </article>
   );
-};
+});
