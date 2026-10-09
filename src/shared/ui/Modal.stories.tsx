@@ -1,21 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useDisclosure } from '../lib/useDisclosure';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { Modal, type ModalProps } from './Modal';
 import { useTranslation } from 'react-i18next';
 
 const ModalDemo = ({ visible, children }: ModalProps): JSX.Element => {
-  const [isOpen, setIsOpen] = useState(visible);
+  const { isOpen, open, close, setIsOpen } = useDisclosure(visible);
   const { t } = useTranslation();
 
   useEffect(() => {
     setIsOpen(visible);
-  }, [visible]);
+  }, [visible, setIsOpen]);
 
   return (
     <div style={{ minHeight: '420px', padding: '32px' }}>
       <button
         type="button"
-        onClick={() => setIsOpen(true)}
+        onClick={open}
         className="ui-button"
       >
         {t('modal.open')}
@@ -23,7 +24,7 @@ const ModalDemo = ({ visible, children }: ModalProps): JSX.Element => {
       <p style={{ color: 'var(--ui-muted)' }}>
         {t('stories.visibility')}: <strong>{String(isOpen)}</strong>
       </p>
-      <Modal visible={isOpen} onClose={() => setIsOpen(false)}>
+      <Modal visible={isOpen} onClose={close}>
         <h2>{t('stories.action')}</h2>
         <p>{children}</p>
       </Modal>

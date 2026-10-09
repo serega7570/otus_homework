@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { AddToCart } from './AddToCart';
 import type { ProductViewProps } from './productTypes';
-import { formatCurrency } from '../../shared/lib/formatters';
+import { ProductContent } from './ProductContent';
 import './product.css';
 
 export const ProductCard = ({
@@ -11,19 +11,16 @@ export const ProductCard = ({
   description,
   count = 0,
 }: ProductViewProps): JSX.Element => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   return (
     <article className="product-card">
       <div className="product-card__image-wrap">
         <img src={image} alt={name} />
         <span>{t('product.new')}</span>
       </div>
-      <div className="product-card__content">
-        <h3>{name}</h3>
-        <p>{description}</p>
-        <strong>{formatCurrency(price, 0, i18n.language)}</strong>
+      <ProductContent className="product-card__content" name={name} description={description} price={price}>
         <AddToCart count={count} />
-      </div>
+      </ProductContent>
     </article>
   );
 };

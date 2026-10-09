@@ -7,7 +7,7 @@ const ru = {
   home: {
     greeting: 'Привет, меня зовут', name: 'Сергей',
     lead: 'Мне 24 года, я живу в Москве и занимаюсь frontend-разработкой в сфере информационной безопасности.',
-    meta: 'Информация о странице', homework: 'Домашнее задание 06', about: 'Обо мне и целях обучения',
+    meta: 'Информация о странице', homework: 'Домашнее задание 07', about: 'Обо мне и целях обучения',
     experienceTitle: 'Мой опыт', experienceText: 'Четыре года разрабатываю интерфейсы для внутренних продуктов компании в сфере информационной безопасности.',
     stackTitle: 'Продукты и стек', stackText: 'Работаю над TI, EDR и EASM-приложениями. В ежедневной разработке использую React, Redux Toolkit и CoreUI.',
     goalTitle: 'Цель обучения', goalText: 'Хочу систематизировать и закрепить накопленные знания, а также расширить инструментарий новыми технологиями и подходами.',
@@ -34,7 +34,7 @@ const en: typeof ru = {
   home: {
     greeting: 'Hi, my name is', name: 'Sergey',
     lead: 'I am 24, I live in Moscow and develop frontend applications in information security.',
-    meta: 'Page information', homework: 'Homework 06', about: 'About me and my learning goals',
+    meta: 'Page information', homework: 'Homework 07', about: 'About me and my learning goals',
     experienceTitle: 'My experience', experienceText: 'For four years, I have been developing interfaces for internal products at an information security company.',
     stackTitle: 'Products and stack', stackText: 'I work on TI, EDR and EASM applications. My daily stack includes React, Redux Toolkit and CoreUI.',
     goalTitle: 'Learning goal', goalText: 'I want to structure and consolidate my knowledge and expand my toolkit with new technologies and approaches.',

@@ -43,6 +43,21 @@ afterEach(() => {
 });
 
 describe('OperationFeed', () => {
+  it('supports another list renderer while retaining the same state and loading behavior', async () => {
+    const user = userEvent.setup();
+    const renderOperations = (operations: ReadonlyArray<factories.Operation>) => (
+      <ol aria-label="Custom operations">
+        {operations.map((operation) => <li key={operation.id}>{operation.category.name}: {operation.amount}</li>)}
+      </ol>
+    );
+    render(<OperationFeed initialCount={2} batchSize={2} autoLoad={false} renderOperations={renderOperations} />, { wrapper });
+    expect(screen.getByRole('list', { name: 'Custom operations' })).toBeInTheDocument();
+    expect(screen.getAllByRole('listitem')).toHaveLength(2);
+    await user.click(screen.getByRole('button', { name: 'Показать ещё' }));
+    expect(screen.getAllByRole('listitem')).toHaveLength(4);
+    expect(screen.getByRole('status')).toHaveTextContent('Операций в списке: 4');
+  });
+
   it('adds new generated operations with the button while preserving existing cards', async () => {
     const factory = jest.spyOn(factories, 'createRandomOperation');
     const user = userEvent.setup();

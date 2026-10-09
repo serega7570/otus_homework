@@ -1,9 +1,8 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { createInstance } from 'i18next';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { I18nextProvider } from 'react-i18next';
-import { resources } from './translations';
+import { createI18n, type Language } from './createI18n';
 
-export type Language = 'ru' | 'en';
+export type { Language } from './createI18n';
 
 type LanguageContextValue = Readonly<{
   language: Language;
@@ -16,32 +15,27 @@ export const LanguageProvider = ({
   children,
   initialLanguage = 'ru',
 }: Readonly<{ children: ReactNode; initialLanguage?: Language }>): JSX.Element => {
-  const [language, setLanguageState] = useState<Language>(initialLanguage);
-  const [i18n] = useState(() => {
-    const instance = createInstance();
-    void instance.init({
-      resources,
-      lng: initialLanguage,
-      fallbackLng: 'ru',
-      supportedLngs: ['ru', 'en'],
-      initAsync: false,
-      interpolation: { escapeValue: false },
-      react: { useSuspense: false },
-    });
-    return instance;
-  });
+  const [i18n] = useState(() => createI18n(initialLanguage));
+  const subscribe = useCallback((listener: () => void) => {
+    i18n.on('languageChanged', listener);
+    return () => { i18n.off('languageChanged', listener); };
+  }, [i18n]);
+  const getLanguage = useCallback((): Language => (
+    i18n.resolvedLanguage === 'en' ? 'en' : 'ru'
+  ), [i18n]);
+  const language = useSyncExternalStore(subscribe, getLanguage, getLanguage);
 
   useEffect(() => {
     document.documentElement.lang = language;
   }, [language]);
 
-  const setLanguage = (nextLanguage: Language): void => {
+  const setLanguage = useCallback((nextLanguage: Language): void => {
     void i18n.changeLanguage(nextLanguage);
-    setLanguageState(nextLanguage);
-  };
+  }, [i18n]);
+  const value = useMemo(() => ({ language, setLanguage }), [language, setLanguage]);
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage }}>
+    <LanguageContext.Provider value={value}>
       <I18nextProvider i18n={i18n}>
         <div lang={language} className="ui-language">{children}</div>
       </I18nextProvider>

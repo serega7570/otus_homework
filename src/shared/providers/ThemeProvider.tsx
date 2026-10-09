@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 
 export type Theme = 'light' | 'dark';
 
@@ -14,12 +14,13 @@ export const ThemeProvider = ({
   initialTheme = 'light',
 }: Readonly<{ children: ReactNode; initialTheme?: Theme }>): JSX.Element => {
   const [theme, setTheme] = useState<Theme>(initialTheme);
-  const toggleTheme = (): void => {
+  const toggleTheme = useCallback((): void => {
     setTheme((current) => current === 'light' ? 'dark' : 'light');
-  };
+  }, []);
+  const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={value}>
       <div className="ui-theme" data-theme={theme}>
         {children}
       </div>
