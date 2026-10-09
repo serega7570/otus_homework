@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { ThemeProvider } from '../shared/providers/ThemeProvider';
 import { LanguageProvider } from '../shared/providers/LanguageProvider';
-import { Header, ModalWithInput } from '../shared/ui';
+import { CroppedText, Header, ModalWithInput } from '../shared/ui';
+import { useDisclosure } from '../shared/lib/useDisclosure';
 import { OperationFeed } from '../entities/operation';
 
 const profileItems = [
@@ -12,6 +13,7 @@ const profileItems = [
 
 const HomePage = (): JSX.Element => {
   const { t } = useTranslation();
+  const { isOpen: notesOpen, open: openNotes, close: closeNotes } = useDisclosure();
 
   return (
     <>
@@ -58,6 +60,14 @@ const HomePage = (): JSX.Element => {
           <h2 id="demo-title">{t('home.demoTitle')}</h2>
           <p>{t('home.demoText')}</p>
           <ModalWithInput />
+        </section>
+
+        <section className="state-demo" aria-labelledby="notes-title">
+          <h2 id="notes-title">{t('croppedText.title')}</h2>
+          <CroppedText opened={notesOpen} rows={3}>{t('croppedText.text')}</CroppedText>
+          <button className="ui-button" style={{ marginTop: 20 }} type="button" onClick={notesOpen ? closeNotes : openNotes} aria-expanded={notesOpen}>
+            {t(notesOpen ? 'croppedText.collapse' : 'croppedText.expand')}
+          </button>
         </section>
 
         <section id="operations" className="state-demo" aria-labelledby="operations-title">

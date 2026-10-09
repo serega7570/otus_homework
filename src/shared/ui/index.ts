@@ -11,3 +11,5 @@ export { ModalWithInputView } from './ModalWithInputView';
 export type { ModalWithInputViewProps } from './ModalWithInputView';
 export { ThemeSwitcher } from './ThemeSwitcher';
 export { LanguageSwitcher } from './LanguageSwitcher';
+export { CroppedText } from './CroppedText';
+export type { CroppedTextProps } from './CroppedText';
