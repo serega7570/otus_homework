@@ -5,6 +5,7 @@ import { CroppedText, Header, ModalWithInput } from '../shared/ui';
 import { useDisclosure } from '../shared/lib/useDisclosure';
 import { OperationFeed } from '../entities/operation';
 import { FormsWorkspace } from '../features/forms/FormsWorkspace';
+import { DiscountManager } from '../features/account/DiscountManager';
 
 const profileItems = [
   { title: 'home.experienceTitle', text: 'home.experienceText', accent: '01' },
@@ -26,6 +27,7 @@ const HomePage = (): JSX.Element => {
           { label: t('navigation.demo'), href: '#demo' },
           { label: t('navigation.operations'), href: '#operations' },
           { label: t('forms.title'), href: '#forms' },
+          { label: t('discounts.title'), href: '#discounts' },
         ]}
       />
       <main className="page">
@@ -70,6 +72,12 @@ const HomePage = (): JSX.Element => {
           <button className="ui-button" style={{ marginTop: 20 }} type="button" onClick={notesOpen ? closeNotes : openNotes} aria-expanded={notesOpen}>
             {t(notesOpen ? 'croppedText.collapse' : 'croppedText.expand')}
           </button>
+        </section>
+
+        <section id="discounts" className="state-demo" aria-labelledby="discounts-title">
+          <h2 id="discounts-title">{t('discounts.title')}</h2>
+          <p>{t('discounts.description')}</p>
+          <DiscountManager />
         </section>
 
         <section id="forms" className="state-demo" aria-labelledby="forms-title">
