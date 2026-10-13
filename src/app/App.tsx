@@ -4,6 +4,7 @@ import { LanguageProvider } from '../shared/providers/LanguageProvider';
 import { CroppedText, Header, ModalWithInput } from '../shared/ui';
 import { useDisclosure } from '../shared/lib/useDisclosure';
 import { OperationFeed } from '../entities/operation';
+import { FormsWorkspace } from '../features/forms/FormsWorkspace';
 
 const profileItems = [
   { title: 'home.experienceTitle', text: 'home.experienceText', accent: '01' },
@@ -24,6 +25,7 @@ const HomePage = (): JSX.Element => {
           { label: t('navigation.about'), href: '#about' },
           { label: t('navigation.demo'), href: '#demo' },
           { label: t('navigation.operations'), href: '#operations' },
+          { label: t('forms.title'), href: '#forms' },
         ]}
       />
       <main className="page">
@@ -68,6 +70,12 @@ const HomePage = (): JSX.Element => {
           <button className="ui-button" style={{ marginTop: 20 }} type="button" onClick={notesOpen ? closeNotes : openNotes} aria-expanded={notesOpen}>
             {t(notesOpen ? 'croppedText.collapse' : 'croppedText.expand')}
           </button>
+        </section>
+
+        <section id="forms" className="state-demo" aria-labelledby="forms-title">
+          <h2 id="forms-title">{t('forms.title')}</h2>
+          <p>{t('forms.description')}</p>
+          <FormsWorkspace />
         </section>
 
         <section id="operations" className="state-demo" aria-labelledby="operations-title">
