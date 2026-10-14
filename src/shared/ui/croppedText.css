@@ -1,0 +1,57 @@
+.ui-cropped-text {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  color: var(--ui-ink);
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.ui-cropped-text__measure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  pointer-events: none;
+  box-sizing: content-box;
+  font: inherit;
+  line-height: inherit;
+  white-space: inherit;
+  overflow-wrap: inherit;
+}
+
+.ui-cropped-text__accessible {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.ui-cropped-text-demo {
+  display: grid;
+  justify-items: start;
+  gap: 20px;
+  max-width: 820px;
+}
+
+.ui-cropped-text-demo__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.ui-cropped-text-demo__container {
+  max-width: 100%;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--ui-line);
+  border-radius: 16px;
+  background: var(--ui-surface);
+}
