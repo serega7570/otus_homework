@@ -1,0 +1,66 @@
+.homework-form {
+  display: grid;
+  gap: 20px;
+  width: 100%;
+  max-width: 640px;
+  min-width: 0;
+}
+
+.form-field {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.form-field label {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.form-field input,
+.form-field textarea,
+.form-field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  padding: 12px 14px;
+  border: 1px solid var(--ui-line);
+  border-radius: 12px;
+  background: var(--ui-canvas);
+  color: var(--ui-ink);
+  font: inherit;
+}
+
+.form-field textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.form-field :is(input, textarea, select):focus-visible {
+  outline: 2px solid var(--ui-accent-ink);
+  outline-offset: 2px;
+}
+
+.form-field [aria-invalid='true'] { border-color: var(--ui-danger); }
+.form-field__hint,
+.form-field__error,
+.homework-form__status { margin: 0; font-size: 13px; line-height: 1.5; }
+.form-field__hint { color: var(--ui-muted); }
+.form-field__error { color: var(--ui-danger); }
+.homework-form__status { color: var(--ui-success); }
+.homework-form__row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.homework-form__actions { display: grid; justify-items: start; gap: 12px; }
+.homework-form .ui-button:disabled,
+.form-field :disabled { opacity: 0.6; cursor: not-allowed; }
+.forms-workspace { display: grid; gap: 28px; }
+.forms-workspace__panel { min-width: 0; padding: 24px; border: 1px solid var(--ui-line); border-radius: 16px; }
+.forms-workspace__panel h3 { margin: 0 0 20px; font-size: 20px; }
+.forms-workspace__switch { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.forms-workspace__switch button { padding: 10px 14px; border: 1px solid var(--ui-line); border-radius: 10px; background: var(--ui-canvas); color: var(--ui-ink); cursor: pointer; }
+.forms-workspace__switch button[aria-pressed='true'] { background: var(--ui-button-bg); color: var(--ui-button-text); }
+
+@media (max-width: 540px) {
+  .homework-form__row { grid-template-columns: 1fr; }
+  .forms-workspace__panel { padding: 16px; }
+}

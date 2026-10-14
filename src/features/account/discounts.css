@@ -1,0 +1,9 @@
+.discount-manager { display: grid; gap: 24px; max-width: 860px; min-width: 0; }
+.discount-manager__forms { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.discount-manager .homework-form { align-content: start; }
+.discount-manager .ui-button { justify-self: start; }
+.discount-manager__result { padding: 20px; border: 1px solid var(--ui-line); border-radius: 16px; background: var(--ui-canvas); }
+.discount-manager__result p { margin: 0 0 12px; color: var(--ui-muted); }
+.discount-manager__formula { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; font-size: 22px; }
+.discount-manager__formula output { font-size: 32px; font-weight: 700; color: var(--ui-accent-ink); }
+@media (max-width: 700px) { .discount-manager__forms { grid-template-columns: 1fr; } }
