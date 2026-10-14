@@ -10,7 +10,6 @@
     "deploy": "npm run build && gh-pages -d dist",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "deploy-storybook": "npm run build-storybook && gh-pages -d storybook-static",
     "test": "jest",
     "typecheck": "tsc --noEmit"
   },
@@ -20,7 +19,8 @@
     "i18next": "^26.4.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-i18next": "^17.0.16"
+    "react-i18next": "^17.0.16",
+    "react-router-dom": "^6.30.6"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",

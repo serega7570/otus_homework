@@ -247,3 +247,21 @@ a {
 #operations {
   scroll-margin-top: 160px;
 }
+
+.screen-panel {
+  min-height: 420px;
+  padding: clamp(20px, 4vw, 36px);
+  border: 1px solid var(--ui-line);
+  border-radius: 22px;
+  background: var(--ui-surface);
+}
+
+.screen-panel h1 {
+  margin: 0;
+  font-family: 'Unbounded', sans-serif;
+  font-size: clamp(24px, 4vw, 36px);
+}
+
+.screen-panel > p { margin: 16px 0 28px; color: var(--ui-muted); line-height: 1.6; }
+.screen-panel__heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; }
+a.ui-button { display: inline-block; text-decoration: none; text-align: center; }

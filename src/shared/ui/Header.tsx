@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Logo } from './Logo';
 import { useTranslation } from 'react-i18next';
 import { ThemeSwitcher } from './ThemeSwitcher';
@@ -12,11 +13,13 @@ export type NavigationItem = Readonly<{
 export type HeaderProps = Readonly<{
   brand?: string;
   navigation?: ReadonlyArray<NavigationItem>;
+  navigationContent?: ReactNode;
 }>;
 
 export const Header = ({
   brand = 'Secure UI',
   navigation,
+  navigationContent,
 }: HeaderProps): JSX.Element => {
   const { t } = useTranslation();
   const items = navigation ?? [
@@ -29,7 +32,7 @@ export const Header = ({
     <header className="ui-header">
       <Logo label={brand} />
       <nav className="ui-header__nav" aria-label={t('navigation.label')}>
-        {items.map(({ label, href }) => (
+        {navigationContent ?? items.map(({ label, href }) => (
           <a href={href} key={href}>
             {label}
           </a>

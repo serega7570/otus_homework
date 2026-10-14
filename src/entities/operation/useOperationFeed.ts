@@ -6,8 +6,8 @@ const createOperations = (count: number): Operation[] => {
   return Array.from({ length: count }, () => createRandomOperation(createdAt));
 };
 
-export const useOperationFeed = (initialCount: number, batchSize: number) => {
-  const [operations, setOperations] = useState(() => createOperations(initialCount));
+export const useOperationFeed = (initialCount: number, batchSize: number, initialOperations?: ReadonlyArray<Operation>) => {
+  const [operations, setOperations] = useState(() => initialOperations ? [...initialOperations] : createOperations(initialCount));
 
   const loadMore = useCallback(() => {
     // Keep generation outside the updater, which StrictMode can invoke twice.
@@ -15,5 +15,13 @@ export const useOperationFeed = (initialCount: number, batchSize: number) => {
     setOperations((current) => [...current, ...nextOperations]);
   }, [batchSize]);
 
-  return { operations, loadMore };
+  const addOperation = useCallback((operation: Operation) => {
+    setOperations((current) => [operation, ...current]);
+  }, []);
+
+  const updateOperation = useCallback((operation: Operation) => {
+    setOperations((current) => current.map((item) => item.id === operation.id ? operation : item));
+  }, []);
+
+  return { operations, loadMore, addOperation, updateOperation };
 };

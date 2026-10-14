@@ -1,13 +1,15 @@
 import { useTranslation } from 'react-i18next';
+import type { ReactNode } from 'react';
 import type { Operation } from '../../homeworks/ts1/3_write';
 import { OperationCard } from './OperationCard';
 import './operation.css';
 
 export type OperationListProps = Readonly<{
   operations: ReadonlyArray<Operation>;
+  renderAction?: (operation: Operation) => ReactNode;
 }>;
 
-export const OperationList = ({ operations }: OperationListProps): JSX.Element => {
+export const OperationList = ({ operations, renderAction }: OperationListProps): JSX.Element => {
   const { t } = useTranslation();
 
   if (operations.length === 0) {
@@ -24,7 +26,9 @@ export const OperationList = ({ operations }: OperationListProps): JSX.Element =
             name={operation.name}
             description={operation.desc ?? ''}
             type={operation.type}
-          />
+          >
+            {renderAction?.(operation)}
+          </OperationCard>
         </li>
       ))}
     </ul>

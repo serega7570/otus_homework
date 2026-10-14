@@ -7,11 +7,12 @@ type ConsoleFormOptions<Values extends FormikValues> = {
   emptyValues: Values;
   validate: FormikConfig<Values>['validate'];
   formatValues?: (values: Values) => unknown;
+  onValidSubmit?: (values: Values) => void;
 };
 
 // Every form follows the homework contract: validate, log, then clear, including edit mode.
 export const useConsoleForm = <Values extends FormikValues>({
-  label, initialValues, emptyValues, validate, formatValues,
+  label, initialValues, emptyValues, validate, formatValues, onValidSubmit,
 }: ConsoleFormOptions<Values>) => {
   const form = useFormik<Values>({
     initialValues,
@@ -20,6 +21,7 @@ export const useConsoleForm = <Values extends FormikValues>({
     onSubmit: (values, { resetForm }) => {
       console.log(label, formatValues ? formatValues(values) : values);
       resetForm({ values: { ...emptyValues }, status: 'forms.submitted' });
+      onValidSubmit?.(values);
     },
   });
   return {

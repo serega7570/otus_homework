@@ -9,6 +9,7 @@ import { ThemeProvider } from '../shared/providers/ThemeProvider';
 import { LanguageSwitcher, ModalWithInput, ThemeSwitcher } from '../shared/ui';
 
 describe('homework 5 state management', () => {
+  beforeEach(() => { window.history.replaceState(null, '', '/'); });
   it('shows the entered text, closes the modal and uses the updated input on reopening', async () => {
     const user = userEvent.setup();
     render(<StrictMode><App /></StrictMode>);
@@ -54,7 +55,7 @@ describe('homework 5 state management', () => {
     await user.selectOptions(screen.getByRole('combobox', { name: 'Язык интерфейса' }), 'en');
 
     expect(screen.getByRole('heading', { name: 'Sergey' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'About me' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Profile' })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: 'Interface language' })).toHaveValue('en');
     expect(screen.getByRole('textbox', { name: 'Message text' })).toHaveValue('Мой текст');
     expect(within(screen.getByRole('dialog', { name: 'Modal window' })).getByText('Мой текст')).toBeInTheDocument();

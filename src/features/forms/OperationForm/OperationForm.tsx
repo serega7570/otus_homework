@@ -3,19 +3,19 @@ import { FormField } from '../FormField';
 import { FormActions } from '../FormActions';
 import { useConsoleForm } from '../useConsoleForm';
 import { validateOperation } from '../validation';
-import { emptyOperation, operationCategories, type OperationFormValues } from './types';
+import { emptyOperation, operationCategories, toOperationDraft, type OperationDraft, type OperationFormValues } from './types';
 
-export type OperationFormProps = Readonly<{ mode?: 'create' | 'edit'; initialValues?: OperationFormValues; disabled?: boolean }>;
+export type OperationFormProps = Readonly<{
+  mode?: 'create' | 'edit'; initialValues?: OperationFormValues; disabled?: boolean;
+  onSave?: (operation: OperationDraft) => void;
+}>;
 
-export const OperationForm = ({ mode = 'create', initialValues = emptyOperation, disabled }: OperationFormProps): JSX.Element => {
+export const OperationForm = ({ mode = 'create', initialValues = emptyOperation, disabled, onSave }: OperationFormProps): JSX.Element => {
   const { t } = useTranslation();
   const form = useConsoleForm({
     label: 'OperationForm', initialValues, emptyValues: emptyOperation, validate: validateOperation,
-    formatValues: (values) => ({
-      mode, name: values.name.trim(), desc: values.desc.trim(), amount: Number(values.amount), type: values.type,
-      category: operationCategories.find((category) => category.id === values.categoryId),
-      createdAt: `${values.date}T00:00:00.000Z`,
-    }),
+    formatValues: (values) => ({ mode, ...toOperationDraft(values) }),
+    onValidSubmit: onSave ? (values) => onSave(toOperationDraft(values)) : undefined,
   });
   const error = (field: keyof OperationFormValues): string | undefined => form.touched[field] || form.submitCount > 0 ? form.errors[field] : undefined;
   const locked = disabled || form.isSubmitting;

@@ -152,6 +152,19 @@
   line-height: 1.6;
 }
 
+.operation-card__actions {
+  grid-column: 2 / -1;
+}
+
+.operation-card__actions a {
+  color: var(--ui-accent-ink);
+  font-size: 14px;
+  font-weight: 600;
+  text-underline-offset: 3px;
+}
+
+.operation-card h3 { overflow-wrap: anywhere; }
+
 .operation-feed {
   max-width: 820px;
 }
