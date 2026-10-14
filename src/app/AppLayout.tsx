@@ -1,17 +1,25 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../shared/ui';
+import { useAppDispatch, useAppSelector } from './store/hooks';
+import { signedOut } from './store/sessionSlice';
 
 export const AppLayout = (): JSX.Element => {
   const { t } = useTranslation();
+  const dispatch = useAppDispatch();
+  const profile = useAppSelector((state) => state.auth.profile);
   return (
     <>
-      <Header brand="OTUS · React" navigationContent={
+      <Header brand="OTUS · React" userLabel={profile?.name} userInitial={profile?.name.slice(0, 1)} actions={
+        profile ? <>
+          <span className="session-badge">{t(`session.${profile.role}`)}</span>
+          <button className="ui-switcher" type="button" onClick={() => dispatch(signedOut())}>{t('session.logout')}</button>
+        </> : <NavLink className="ui-switcher" to="/login">{t('session.login')}</NavLink>
+      } navigationContent={
         <>
           <NavLink to="/" end>{t('navigation.overview')}</NavLink>
           <NavLink to="/profile">{t('routing.profile')}</NavLink>
           <NavLink to="/operations">{t('navigation.operations')}</NavLink>
-          <NavLink to="/forms">{t('forms.title')}</NavLink>
           <NavLink to="/discounts">{t('discounts.title')}</NavLink>
         </>
       } />

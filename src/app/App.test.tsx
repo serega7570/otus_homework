@@ -9,7 +9,7 @@ import { ThemeProvider } from '../shared/providers/ThemeProvider';
 import { LanguageSwitcher, ModalWithInput, ThemeSwitcher } from '../shared/ui';
 
 describe('homework 5 state management', () => {
-  beforeEach(() => { window.history.replaceState(null, '', '/'); });
+  beforeEach(() => { window.history.replaceState(null, '', '/'); localStorage.clear(); });
   it('shows the entered text, closes the modal and uses the updated input on reopening', async () => {
     const user = userEvent.setup();
     render(<StrictMode><App /></StrictMode>);

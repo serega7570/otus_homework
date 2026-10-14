@@ -6,15 +6,19 @@ import { validateAuth } from '../validation';
 
 export type AuthMode = 'login' | 'register';
 export type AuthFormValues = { email: string; password: string; confirmPassword: string };
-export type AuthFormProps = Readonly<{ mode?: AuthMode; disabled?: boolean }>;
+export type AuthFormProps = Readonly<{
+  mode?: AuthMode; disabled?: boolean;
+  onAuthenticate?: (values: Pick<AuthFormValues, 'email'>, mode: AuthMode) => void;
+}>;
 const emptyAuth: AuthFormValues = { email: '', password: '', confirmPassword: '' };
 
-const AuthFields = ({ mode, disabled }: Required<Pick<AuthFormProps, 'mode'>> & Pick<AuthFormProps, 'disabled'>): JSX.Element => {
+const AuthFields = ({ mode, disabled, onAuthenticate }: Required<Pick<AuthFormProps, 'mode'>> & Pick<AuthFormProps, 'disabled' | 'onAuthenticate'>): JSX.Element => {
   const { t } = useTranslation();
   const form = useConsoleForm({
     label: mode === 'login' ? 'LoginForm' : 'RegistrationForm', initialValues: emptyAuth, emptyValues: emptyAuth,
     validate: (values) => validateAuth(values, mode),
-    formatValues: ({ email, password }) => ({ email: email.trim(), password }),
+    formatValues: ({ email, password }) => onAuthenticate ? { email: email.trim() } : { email: email.trim(), password },
+    onValidSubmit: onAuthenticate ? ({ email }) => onAuthenticate({ email: email.trim() }, mode) : undefined,
   });
   const error = (field: keyof AuthFormValues): string | undefined => form.touched[field] || form.submitCount > 0 ? form.errors[field] : undefined;
   const locked = disabled || form.isSubmitting;
@@ -28,4 +32,4 @@ const AuthFields = ({ mode, disabled }: Required<Pick<AuthFormProps, 'mode'>> & 
   );
 };
 
-export const AuthForm = ({ mode = 'login', disabled }: AuthFormProps): JSX.Element => <AuthFields key={mode} mode={mode} disabled={disabled} />;
+export const AuthForm = ({ mode = 'login', disabled, onAuthenticate }: AuthFormProps): JSX.Element => <AuthFields key={mode} mode={mode} disabled={disabled} onAuthenticate={onAuthenticate} />;

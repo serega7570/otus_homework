@@ -6,6 +6,9 @@ import { MemoryRouter, useLocation, useNavigate } from 'react-router-dom';
 import { AppRoutes } from './App';
 import { ThemeProvider } from '../shared/providers/ThemeProvider';
 import { LanguageProvider } from '../shared/providers/LanguageProvider';
+import { StoreProvider } from './store/StoreProvider';
+import { createAppStore } from './store/store';
+import { appInitialized, createDemoToken } from './store/sessionSlice';
 
 const HistoryControls = () => {
   const location = useLocation();
@@ -13,13 +16,19 @@ const HistoryControls = () => {
   return <><output aria-label="URL">{location.pathname}</output><button onClick={() => navigate(-1)}>Back</button><button onClick={() => navigate(1)}>Forward</button></>;
 };
 
-const renderRoute = (route = '/') => render(
-  <ThemeProvider initialTheme="dark"><LanguageProvider>
-    <MemoryRouter initialEntries={[route]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <HistoryControls /><AppRoutes />
-    </MemoryRouter>
-  </LanguageProvider></ThemeProvider>,
-);
+const renderRoute = (route = '/') => {
+  const store = createAppStore();
+  store.dispatch(appInitialized(createDemoToken('admin@example.com', 'login')));
+  return render(
+    <ThemeProvider initialTheme="dark"><LanguageProvider>
+      <StoreProvider store={store} syncTabs={false}>
+        <MemoryRouter initialEntries={[route]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <HistoryControls /><AppRoutes />
+        </MemoryRouter>
+      </StoreProvider>
+    </LanguageProvider></ThemeProvider>,
+  );
+};
 
 describe('application routing', () => {
   let log: jest.SpyInstance;
@@ -33,7 +42,6 @@ describe('application routing', () => {
     for (const [link, heading, url] of [
       ['Профиль', 'Профиль', '/profile'],
       ['Операции', 'Доходы и расходы', '/operations'],
-      ['Формы', 'Формы', '/forms'],
       ['Скидки пользователей', 'Скидки пользователей', '/discounts'],
       ['Обзор', 'Сергей', '/'],
     ]) {
@@ -58,7 +66,7 @@ describe('application routing', () => {
     await user.type(name, 'Анна');
     await user.click(submit);
     await waitFor(() => expect(log).toHaveBeenCalledWith('ProfileForm', expect.objectContaining({ name: 'Анна' })));
-    expect(name).toHaveValue('');
+    expect(name).toHaveValue('Анна');
   });
 
   it('uses URL history to mount and unmount the create portal, including back and forward', async () => {

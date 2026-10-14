@@ -14,12 +14,18 @@ export type HeaderProps = Readonly<{
   brand?: string;
   navigation?: ReadonlyArray<NavigationItem>;
   navigationContent?: ReactNode;
+  actions?: ReactNode;
+  userLabel?: string;
+  userInitial?: string;
 }>;
 
 export const Header = ({
   brand = 'Secure UI',
   navigation,
   navigationContent,
+  actions,
+  userLabel,
+  userInitial,
 }: HeaderProps): JSX.Element => {
   const { t } = useTranslation();
   const items = navigation ?? [
@@ -41,9 +47,10 @@ export const Header = ({
       <div className="ui-header__controls">
         <ThemeSwitcher />
         <LanguageSwitcher />
+        {actions}
       </div>
-      <div className="ui-header__avatar" aria-label={t('profile.label')}>
-        {t('profile.initial')}
+      <div className="ui-header__avatar" aria-label={userLabel ?? t('profile.label')}>
+        {userInitial ?? t('profile.initial')}
       </div>
     </header>
   );

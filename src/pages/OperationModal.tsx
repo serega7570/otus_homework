@@ -2,7 +2,8 @@ import { useCallback } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Modal } from '../shared/ui';
-import { useOperations } from '../app/OperationsProvider';
+import { useAppDispatch, useAppSelector } from '../app/store/hooks';
+import { saveOperation } from '../app/store/thunks';
 import { OperationForm } from '../features/forms/OperationForm/OperationForm';
 import { toOperationFormValues, type OperationDraft } from '../features/forms/OperationForm/types';
 
@@ -11,15 +12,15 @@ export const OperationModal = ({ mode }: { mode: 'create' | 'edit' }): JSX.Eleme
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { operations, addOperation, updateOperation } = useOperations();
+  const operations = useAppSelector((state) => state.operations.items);
+  const dispatch = useAppDispatch();
   const operation = mode === 'edit' ? operations.find((item) => item.id === id) : undefined;
   const close = useCallback(() => {
     if (location.state?.operationModal === true) navigate(-1);
     else navigate('/operations', { replace: true });
   }, [location.state, navigate]);
   const save = (draft: OperationDraft): void => {
-    if (mode === 'edit' && operation) updateOperation({ ...draft, id: operation.id });
-    else if (mode === 'create') addOperation({ ...draft, id: crypto.randomUUID() });
+    dispatch(saveOperation(draft, operation?.id));
     close();
   };
   const missing = mode === 'edit' && !operation;
