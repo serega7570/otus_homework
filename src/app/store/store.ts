@@ -2,6 +2,7 @@ import { configureStore, createListenerMiddleware, isAnyOf, type ThunkAction, ty
 import { normalizeToken, sessionSlice, signedIn, signedOut } from './sessionSlice';
 import { operationsSlice } from './operationsSlice';
 import { TOKEN_STORAGE_KEY, type TokenStorage } from './tokenStorage';
+import { signupApi } from '../../features/signup/signupApi';
 
 export const createAppStore = (storage?: TokenStorage) => {
   const persistence = createListenerMiddleware();
@@ -19,8 +20,8 @@ export const createAppStore = (storage?: TokenStorage) => {
     },
   });
   return configureStore({
-    reducer: { auth: sessionSlice.reducer, operations: operationsSlice.reducer },
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware({ thunk: { extraArgument: { storage } } }).prepend(persistence.middleware),
+    reducer: { auth: sessionSlice.reducer, operations: operationsSlice.reducer, [signupApi.reducerPath]: signupApi.reducer },
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({ thunk: { extraArgument: { storage } } }).prepend(persistence.middleware).concat(signupApi.middleware),
   });
 };
 

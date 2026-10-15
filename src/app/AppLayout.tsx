@@ -21,6 +21,7 @@ export const AppLayout = (): JSX.Element => {
           <NavLink to="/profile">{t('routing.profile')}</NavLink>
           <NavLink to="/operations">{t('navigation.operations')}</NavLink>
           <NavLink to="/discounts">{t('discounts.title')}</NavLink>
+          <NavLink to="/signup">{t('signup.title')}</NavLink>
         </>
       } />
       <main className="page">

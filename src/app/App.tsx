@@ -14,6 +14,7 @@ import { NotFoundPage } from '../pages/NotFoundPage';
 import { ExamplesPage } from '../pages/ExamplesPage';
 import { LoginPage } from '../pages/LoginPage';
 import { ForbiddenPage } from '../pages/ForbiddenPage';
+import { SignupPage } from '../pages/SignupPage';
 
 export const AppRoutes = (): JSX.Element => {
   const initialized = useAppSelector((state) => state.auth.initialized);
@@ -33,6 +34,7 @@ export const AppRoutes = (): JSX.Element => {
           </Route>
         </Route>
         <Route path="login" element={<LoginPage />} />
+        <Route path="signup" element={<SignupPage />} />
         <Route path="forms" element={<Navigate to="/login" replace />} />
         <Route path="forbidden" element={<ForbiddenPage />} />
         <Route path="discounts" element={<ExamplesPage />} />
