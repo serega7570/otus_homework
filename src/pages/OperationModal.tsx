@@ -2,35 +2,27 @@ import { useCallback } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Modal } from '../shared/ui';
-import { useAppDispatch, useAppSelector } from '../app/store/hooks';
-import { saveOperation } from '../app/store/thunks';
-import { OperationForm } from '../features/forms/OperationForm/OperationForm';
-import { toOperationFormValues, type OperationDraft } from '../features/forms/OperationForm/types';
+import { useAppSelector } from '../app/store/hooks';
+import { useOperationQuery } from '../shared/api/serverApi';
+import { ApiError } from '../features/server/Feedback';
+import { ServerOperationForm } from '../features/server/ServerOperationForm';
 
 export const OperationModal = ({ mode }: { mode: 'create' | 'edit' }): JSX.Element => {
   const { t } = useTranslation();
   const { id } = useParams();
+  const token = useAppSelector((state) => state.auth.token)!;
+  const query = useOperationQuery({ id: id ?? '', token }, { skip: mode === 'create' || !id });
   const location = useLocation();
   const navigate = useNavigate();
-  const operations = useAppSelector((state) => state.operations.items);
-  const dispatch = useAppDispatch();
-  const operation = mode === 'edit' ? operations.find((item) => item.id === id) : undefined;
   const close = useCallback(() => {
     if (location.state?.operationModal === true) navigate(-1);
     else navigate('/operations', { replace: true });
   }, [location.state, navigate]);
-  const save = (draft: OperationDraft): void => {
-    dispatch(saveOperation(draft, operation?.id));
-    close();
-  };
-  const missing = mode === 'edit' && !operation;
-  const title = t(missing ? 'routing.operationNotFound' : `forms.operation.${mode}Title`);
-  return (
-    <Modal visible onClose={close} label={title}>
-      <h2>{title}</h2>
-      {missing ? <p>{t('routing.operationNotFoundDescription')}</p> : (
-        <OperationForm key={`${mode}:${id ?? 'new'}`} mode={mode} initialValues={operation ? toOperationFormValues(operation) : undefined} onSave={save} />
-      )}
-    </Modal>
-  );
+  const title = t(`forms.operation.${mode}Title`);
+  return <Modal visible onClose={close} label={title}>
+    <h2>{title}</h2>
+    {mode === 'edit' && query.isLoading && <p role="status">{t('session.loading')}</p>}
+    <ApiError error={query.error} retry={() => { void query.refetch(); }} />
+    {(mode === 'create' || query.currentData) && <ServerOperationForm key={`${mode}:${id ?? 'new'}`} operation={query.currentData} onSaved={close} />}
+  </Modal>;
 };

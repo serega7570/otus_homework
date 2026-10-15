@@ -15,20 +15,22 @@ import { ExamplesPage } from '../pages/ExamplesPage';
 import { LoginPage } from '../pages/LoginPage';
 import { ForbiddenPage } from '../pages/ForbiddenPage';
 import { SignupPage } from '../pages/SignupPage';
+import { ShopPage } from '../pages/ShopPage';
+import { ServerSession } from './ServerSession';
+import '../features/server/server.css';
 
 export const AppRoutes = (): JSX.Element => {
   const initialized = useAppSelector((state) => state.auth.initialized);
   const { t } = useTranslation();
   if (!initialized) return <p role="status">{t('session.loading')}</p>;
   return (
-    <Routes>
+    <ServerSession><Routes>
       <Route element={<AppLayout />}>
         <Route index element={<HomePage />} />
         <Route element={<RequireAuth />}>
           <Route path="profile" element={<ProfilePage />} />
-        </Route>
-        <Route path="operations" element={<OperationsPage />}>
-          <Route element={<RequireAuth adminOnly />}>
+          <Route path="shop" element={<ShopPage />} />
+          <Route path="operations" element={<OperationsPage />}>
             <Route path="new" element={<OperationModal mode="create" />} />
             <Route path=":id/edit" element={<OperationModal mode="edit" />} />
           </Route>
@@ -40,7 +42,7 @@ export const AppRoutes = (): JSX.Element => {
         <Route path="discounts" element={<ExamplesPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
-    </Routes>
+    </Routes></ServerSession>
   );
 };
 

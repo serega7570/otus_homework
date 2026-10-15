@@ -2,7 +2,7 @@
 import { createAppStore } from './store';
 import { startTokenSync } from './tokenSync';
 import { TOKEN_STORAGE_KEY } from './tokenStorage';
-import { profileUpdated, signedOut } from './sessionSlice';
+import { profileReceived, signedOut } from './sessionSlice';
 
 describe('token storage synchronization', () => {
   let stop: (() => void) | undefined;
@@ -17,11 +17,11 @@ describe('token storage synchronization', () => {
     const store = createAppStore(localStorage);
     stop = startTokenSync(store, window);
     expect(store.getState().auth.token).toBe('first');
-    store.dispatch(profileUpdated({ name: 'Анна', about: '' }));
+    store.dispatch(profileReceived({ token: 'first', profile: { id: '1', name: 'Анна', email: 'user@example.com', commandId: 'test', signUpDate: '' } }));
     localStorage.setItem(TOKEN_STORAGE_KEY, 'second');
     const write = jest.spyOn(Storage.prototype, 'setItem');
     emit(TOKEN_STORAGE_KEY, 'second');
-    expect(store.getState().auth).toMatchObject({ token: 'second', profile: { name: 'Сергей' } });
+    expect(store.getState().auth).toMatchObject({ token: 'second', profile: null });
     expect(write).not.toHaveBeenCalled();
   });
 

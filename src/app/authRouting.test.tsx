@@ -1,165 +1,116 @@
-/** @jest-environment jsdom */
+/** @jest-environment ./src/test/FetchEnvironment.cjs */
 import '@testing-library/jest-dom';
 import { StrictMode } from 'react';
 import { act, render, screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { AppRoutes } from './App';
-import { StoreProvider } from './store/StoreProvider';
-import { createAppStore } from './store/store';
-import { appInitialized, createDemoToken, signedOut } from './store/sessionSlice';
-import { TOKEN_STORAGE_KEY } from './store/tokenStorage';
 import { ThemeProvider } from '../shared/providers/ThemeProvider';
 import { LanguageProvider } from '../shared/providers/LanguageProvider';
+import { StoreProvider } from './store/StoreProvider';
+import { createAppStore } from './store/store';
+import { appInitialized, tokenReceived } from './store/sessionSlice';
+import { TOKEN_STORAGE_KEY } from './store/tokenStorage';
+import { createMockServer, errorResponse } from '../test/mockServer';
+import { serverApi } from '../shared/api/serverApi';
 
-const CurrentUrl = () => <output aria-label="Current URL">{useLocation().pathname}</output>;
+const Url = () => <output aria-label="URL">{useLocation().pathname}</output>;
+const nativeFetch = globalThis.fetch;
+let backend: ReturnType<typeof createMockServer>;
+const stores: ReturnType<typeof createAppStore>[] = [];
+beforeEach(() => { localStorage.clear(); backend = createMockServer(); globalThis.fetch = backend.fetch; });
+afterEach(() => { for (const store of stores.splice(0)) store.dispatch(serverApi.util.resetApiState()); globalThis.fetch = nativeFetch; localStorage.clear(); });
 const renderSession = (route: string, token: string | null = null, syncTabs = false) => {
-  const store = createAppStore(localStorage);
   if (token) localStorage.setItem(TOKEN_STORAGE_KEY, token);
+  const store = createAppStore(localStorage); stores.push(store);
   store.dispatch(appInitialized(token));
-  const rendered = render(
-    <ThemeProvider><LanguageProvider><StoreProvider store={store} syncTabs={syncTabs}>
-      <MemoryRouter initialEntries={[route]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <CurrentUrl /><AppRoutes />
-      </MemoryRouter>
-    </StoreProvider></LanguageProvider></ThemeProvider>,
-  );
-  return { ...rendered, store };
+  render(<StrictMode><ThemeProvider><LanguageProvider><StoreProvider store={store} syncTabs={syncTabs}>
+    <MemoryRouter initialEntries={[route]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><Url /><AppRoutes /></MemoryRouter>
+  </StoreProvider></LanguageProvider></ThemeProvider></StrictMode>);
+  return store;
 };
-
-describe('authentication and protected routes', () => {
-  let log: jest.SpyInstance;
-  beforeEach(() => { localStorage.clear(); log = jest.spyOn(console, 'log').mockImplementation(() => {}); });
-  afterEach(() => { log.mockRestore(); localStorage.clear(); });
-  const adminToken = () => createDemoToken('admin@example.com', 'login');
-
-  it('redirects guests from profile to login, validates credentials and returns to profile after login', async () => {
-    const user = userEvent.setup();
-    const { store } = renderSession('/profile');
-    expect(screen.getByLabelText('Current URL')).toHaveTextContent('/login');
-    expect(screen.queryByRole('form', { name: 'Редактирование профиля' })).not.toBeInTheDocument();
-    const form = within(screen.getByRole('form', { name: 'Вход' }));
-    await user.click(form.getByRole('button', { name: 'Войти' }));
-    expect(await form.findAllByRole('alert')).toHaveLength(2);
-    expect(store.getState().auth.token).toBeNull();
-    await user.type(form.getByRole('textbox', { name: 'Email' }), 'user@example.com');
-    await user.type(form.getByLabelText(/Пароль/), 'password8');
-    await user.click(form.getByRole('button', { name: 'Войти' }));
-    expect(await screen.findByRole('heading', { name: 'Профиль', level: 1 })).toBeInTheDocument();
-    expect(store.getState().auth.profile?.role).toBe('user');
-    expect(localStorage.getItem(TOKEN_STORAGE_KEY)).toBe(store.getState().auth.token);
-    expect(log).toHaveBeenCalledWith('LoginForm', { email: 'user@example.com' });
-    expect(JSON.stringify(store.getState())).not.toContain('password8');
-  });
-
-  it.each(['/operations/new', '/operations/groceries/edit'])('returns an administrator to the requested modal after sign-in: %s', async (route) => {
-    const user = userEvent.setup();
-    const { store } = renderSession(route);
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    const form = within(screen.getByRole('form', { name: 'Вход' }));
-    await user.type(form.getByRole('textbox', { name: 'Email' }), 'admin@example.com');
-    await user.type(form.getByLabelText(/Пароль/), 'password8');
-    await user.click(form.getByRole('button', { name: 'Войти' }));
-    expect(await screen.findByRole('dialog')).toBeInTheDocument();
-    expect(screen.getByLabelText('Current URL')).toHaveTextContent(route);
-    expect(store.getState().auth.profile?.role).toBe('admin');
-  });
-
-  it('allows public reading but hides create/edit controls from guests', () => {
-    renderSession('/operations');
-    expect(screen.getByRole('list')).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Добавить операцию' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: /^Редактировать:/ })).not.toBeInTheDocument();
-  });
-
-  it.each(['/operations/new', '/operations/groceries/edit'])('denies a regular user the direct administrator route: %s', (route) => {
-    renderSession(route, createDemoToken('user@example.com', 'login'));
-    expect(screen.getByRole('heading', { name: 'Доступ запрещён' })).toBeInTheDocument();
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(screen.getByLabelText('Current URL')).toHaveTextContent('/forbidden');
-  });
-
-  it('registers a regular user even with the administrator email', async () => {
-    const user = userEvent.setup();
-    const { store } = renderSession('/login');
-    await user.click(within(screen.getByRole('group', { name: 'Режим авторизации' })).getByRole('button', { name: 'Регистрация' }));
-    const form = within(screen.getByRole('form', { name: 'Регистрация' }));
-    await user.type(form.getByRole('textbox', { name: 'Email' }), 'admin@example.com');
-    await user.type(form.getByLabelText(/^Пароль/), 'password8');
-    await user.type(form.getByLabelText(/^Повторите пароль/), 'password8');
-    await user.click(form.getByRole('button', { name: 'Зарегистрироваться' }));
-    expect(await screen.findByRole('heading', { name: 'Профиль', level: 1 })).toBeInTheDocument();
-    expect(store.getState().auth.profile?.role).toBe('user');
-    expect(log).toHaveBeenCalledWith('RegistrationForm', { email: 'admin@example.com' });
-  });
-
-  it('stores profile edits and displays them on returning to the profile screen', async () => {
-    const user = userEvent.setup();
-    const { store } = renderSession('/profile', 'regular-token');
-    const name = screen.getByRole('textbox', { name: 'Имя' });
-    await user.clear(name);
-    await user.type(name, 'Анна');
-    await user.click(screen.getByRole('button', { name: 'Сохранить профиль' }));
-    await waitFor(() => expect(store.getState().auth.profile?.name).toBe('Анна'));
-    const navigation = within(screen.getByRole('navigation'));
-    await user.click(navigation.getByRole('link', { name: 'Операции' }));
-    await user.click(navigation.getByRole('link', { name: 'Профиль' }));
-    expect(screen.getByRole('textbox', { name: 'Имя' })).toHaveValue('Анна');
-    expect(store.getState().auth.profile?.role).toBe('user');
-  });
-
-  it('logs out, clears storage and removes protected profile data immediately', async () => {
-    const user = userEvent.setup();
-    const { store } = renderSession('/profile', adminToken());
-    await user.click(screen.getByRole('button', { name: 'Выйти' }));
-    expect(screen.getByRole('form', { name: 'Вход' })).toBeInTheDocument();
-    expect(store.getState().auth).toMatchObject({ token: null, profile: null, initialized: true });
-    expect(localStorage.getItem(TOKEN_STORAGE_KEY)).toBeNull();
-  });
-
-  it('removes an open portal and denies access when another tab changes the admin session to a user', async () => {
-    const { store } = renderSession('/operations/groceries/edit', adminToken(), true);
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    const nextToken = createDemoToken('user@example.com', 'login');
-    act(() => {
-      localStorage.setItem(TOKEN_STORAGE_KEY, nextToken);
-      window.dispatchEvent(new StorageEvent('storage', { key: TOKEN_STORAGE_KEY, newValue: nextToken, storageArea: localStorage }));
-    });
-    expect(await screen.findByRole('heading', { name: 'Доступ запрещён' })).toBeInTheDocument();
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(document.body.style.overflow).toBe('');
-    expect(store.getState().auth.profile?.role).toBe('user');
-    expect(store.getState().auth.token).toBe(nextToken);
-  });
-
-  it('redirects a protected profile when the token is cleared in another tab', async () => {
-    const { store } = renderSession('/profile', adminToken(), true);
-    act(() => {
-      localStorage.clear();
-      window.dispatchEvent(new StorageEvent('storage', { key: null, storageArea: localStorage }));
-    });
-    expect(await screen.findByRole('form', { name: 'Вход' })).toBeInTheDocument();
-    expect(store.getState().auth.profile).toBeNull();
-  });
-
-  it('initializes once in StrictMode and restores a persisted administrator before checking routes', () => {
-    localStorage.setItem(TOKEN_STORAGE_KEY, adminToken());
-    const store = createAppStore(localStorage);
-    let initializationTransitions = 0;
-    let previouslyInitialized = false;
-    const unsubscribe = store.subscribe(() => {
-      if (!previouslyInitialized && store.getState().auth.initialized) initializationTransitions += 1;
-      previouslyInitialized = store.getState().auth.initialized;
-    });
-    render(<StrictMode><ThemeProvider><LanguageProvider><StoreProvider store={store}>
-      <MemoryRouter initialEntries={['/operations/new']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><AppRoutes /></MemoryRouter>
-    </StoreProvider></LanguageProvider></ThemeProvider></StrictMode>);
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    expect(initializationTransitions).toBe(1);
-    act(() => { store.dispatch(signedOut()); });
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(screen.getByRole('form', { name: 'Вход' })).toBeInTheDocument();
-    expect(initializationTransitions).toBe(1);
-    unsubscribe();
-  });
+const login = async (password = 'password8') => {
+  const user = userEvent.setup();
+  const form = within(await screen.findByRole('form', { name: 'Вход' }));
+  await user.type(form.getByLabelText('Email'), 'user@example.com');
+  await user.type(form.getByLabelText('Пароль'), password);
+  await user.click(form.getByRole('button', { name: 'Войти' }));
+};
+it.each(['/profile', '/operations', '/operations/new', '/shop'])('authenticates on the server and returns to %s', async (route) => {
+  const store = renderSession(route);
+  expect(await screen.findByRole('form', { name: 'Вход' })).toBeInTheDocument();
+  await login();
+  await waitFor(() => expect(screen.getByLabelText('URL')).toHaveTextContent(new RegExp(`^${route}$`)));
+  expect(store.getState().auth.profile?.email).toBe('user@example.com');
+  expect(localStorage.getItem(TOKEN_STORAGE_KEY)).toBe('server-token');
+  expect(JSON.stringify(store.getState())).not.toMatch(/password8|SECRET_HASH/);
+});
+it('renders server credential errors and permits retry without navigating', async () => {
+  const store = renderSession('/login');
+  await login('wrong');
+  expect(await screen.findByRole('alert')).toHaveTextContent('Неверный email или пароль.');
+  expect(store.getState().auth.token).toBeNull();
+  const user = userEvent.setup();
+  await user.clear(screen.getByLabelText('Пароль'));
+  await user.type(screen.getByLabelText('Пароль'), 'password8');
+  await user.click(screen.getByRole('button', { name: 'Войти' }));
+  expect(await screen.findByRole('heading', { name: 'Профиль', level: 1 })).toBeInTheDocument();
+});
+it('restores a real profile and clears an expired token even when the API returns status 400', async () => {
+  const store = renderSession('/profile', 'expired-token');
+  expect(await screen.findByRole('form', { name: 'Вход' })).toBeInTheDocument();
+  expect(store.getState().auth).toEqual({ initialized: true, token: null, profile: null });
+  expect(localStorage.getItem(TOKEN_STORAGE_KEY)).toBeNull();
+});
+it('keeps a stored token after a network failure and offers profile verification retry', async () => {
+  backend.overrides.set('GET profile', () => { throw new TypeError('Offline'); });
+  const store = renderSession('/profile', 'server-token');
+  expect(await screen.findByRole('alert')).toHaveTextContent('Не удалось связаться с сервером.');
+  expect(store.getState().auth.token).toBe('server-token');
+  backend.overrides.delete('GET profile');
+  await userEvent.setup().click(screen.getByRole('button', { name: 'Повторить' }));
+  expect(await screen.findByRole('textbox', { name: 'Имя' })).toHaveValue('Анна');
+});
+it('saves the profile through PUT and restores the server name after remount', async () => {
+  renderSession('/profile', 'server-token');
+  const user = userEvent.setup();
+  const name = await screen.findByRole('textbox', { name: 'Имя' });
+  await user.clear(name); await user.type(name, 'maria_otus');
+  await user.click(screen.getByRole('button', { name: 'Сохранить профиль' }));
+  expect(await screen.findByText('Изменения сохранены на сервере.')).toBeInTheDocument();
+  expect(backend.state.profile.name).toBe('maria_otus');
+  const request = backend.requests.find((r) => r.method === 'PUT' && r.url.endsWith('/profile'))!;
+  expect(await request.json()).toEqual({ name: 'maria_otus' });
+  const navigation = within(screen.getByRole('navigation'));
+  await user.click(navigation.getByRole('link', { name: 'Операции' }));
+  await user.click(navigation.getByRole('link', { name: 'Профиль' }));
+  expect(await screen.findByRole('textbox', { name: 'Имя' })).toHaveValue('maria_otus');
+});
+it('preserves profile input and displays a server field validation error', async () => {
+  backend.overrides.set('PUT profile', () => errorResponse('ERR_VALIDATION_ERROR', '"Анна" is not valid nickname'));
+  renderSession('/profile', 'server-token');
+  const user = userEvent.setup();
+  const name = await screen.findByRole('textbox', { name: 'Имя' });
+  await user.click(screen.getByRole('button', { name: 'Сохранить профиль' }));
+  expect(await screen.findByRole('alert')).toHaveTextContent('Имя: от 7 символов.');
+  expect(name).toHaveValue('Анна');
+  expect(name).toHaveAttribute('aria-invalid', 'true');
+});
+it('logs out and removes private API cache and credentials', async () => {
+  const store = renderSession('/operations', 'server-token');
+  await screen.findByRole('heading', { name: 'Операция 1' });
+  await userEvent.setup().click(screen.getByRole('button', { name: 'Выйти' }));
+  expect(await screen.findByRole('form', { name: 'Вход' })).toBeInTheDocument();
+  expect(localStorage.getItem(TOKEN_STORAGE_KEY)).toBeNull();
+  expect(JSON.stringify(store.getState())).not.toContain('Операция 1');
+});
+it('clears a private modal on cross-tab logout and verifies a replacement token', async () => {
+  const store = renderSession('/operations/new', 'server-token', true);
+  expect(await screen.findByRole('dialog')).toBeInTheDocument();
+  act(() => { localStorage.removeItem(TOKEN_STORAGE_KEY); window.dispatchEvent(new StorageEvent('storage', { key: TOKEN_STORAGE_KEY, storageArea: localStorage })); });
+  expect(await screen.findByRole('form', { name: 'Вход' })).toBeInTheDocument();
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  expect(document.body.style.overflow).toBe('');
+  act(() => { store.dispatch(tokenReceived('second-token')); });
+  await waitFor(() => expect(store.getState().auth.profile?.email).toBe('second@example.com'));
 });
